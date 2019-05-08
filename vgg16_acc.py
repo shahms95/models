@@ -4,9 +4,20 @@ from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_a
 from keras.applications.vgg16 import VGG16
 from keras import optimizers
 import numpy as np
+import os 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-g", "--gpu", type=int, default=0,
+                    help="The ID of GPU to be used; default = 0")
+args = parser.parse_args() 
+config = tf.ConfigProto() 
+
+os.environ["CUDA_VISIBLE_DEVICES"]=str(args.gpu)
+print("CUDA visible devices : ", os.environ["CUDA_VISIBLE_DEVICES"])
+
+config.gpu_options.allow_growth=True
 
 
-config = tf.ConfigProto( device_count = {'GPU': 1 } ) 
 sess = tf.Session(config=config) 
 K.set_session(sess)
 

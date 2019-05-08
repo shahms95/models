@@ -8,7 +8,9 @@ import numpy as np
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 import matplotlib.pyplot as plt
 import tkinter
-import os
+import argparse
+
+
 from keras.applications.resnet50 import ResNet50
 
 # os.remove("data.txt")
@@ -35,7 +37,16 @@ def f(params):
     batch_size = params['batch_size']
     momentum = params['momentum']
     # batch_size = 
-    config = tf.ConfigProto( device_count = {'GPU': 1 } ) 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-g", "--gpu", type=int, default=0,
+                        help="The ID of GPU to be used; default = 0")
+    args = parser.parse_args() 
+    config = tf.ConfigProto() 
+
+    os.environ["CUDA_VISIBLE_DEVICES"]=str(args.gpu)
+    print("CUDA visible devices : ", os.environ["CUDA_VISIBLE_DEVICES"])
+
+    config.gpu_options.allow_growth=True
     sess = tf.Session(config=config) 
     K.set_session(sess)
 
