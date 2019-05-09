@@ -40,8 +40,8 @@ def f(params):
     config = tf.ConfigProto() 
     sess = tf.Session(config=config) 
     K.set_session(sess)
-    # os.environ["CUDA_VISIBLE_DEVICES"]='1,2,3'
-    # config.gpu_options.allow_growth=True
+    os.environ["CUDA_VISIBLE_DEVICES"]='0,1,2,3'
+    config.gpu_options.allow_growth=True
 
     model = ResNet50(include_top=True, weights=None)
 
@@ -91,7 +91,7 @@ def f(params):
 
     return {'loss': res, 'status': STATUS_OK}
 
-for i, d in enumerate(['/xla_gpu:1', '/xla_gpu:2', 'xla_gpu:3']):
+for i, d in enumerate(['/xla_gpu:0','/xla_gpu:1', '/xla_gpu:2', 'xla_gpu:3']):
 
     with tf.device(d):
         trials = Trials()
