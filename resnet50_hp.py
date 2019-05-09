@@ -8,12 +8,12 @@ import numpy as np
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 import matplotlib.pyplot as plt
 import tkinter
-import argparse
 import os
-
 from keras.applications.resnet50 import ResNet50
 
 # os.remove("data.txt")
+
+
 
 learning_rate_vector1 = [0.005, 0.01, 0.015, 0.02, 0.025]
 learning_rate_vector2 = [0.03, 0.035, 0.04, 0.045, 0.05]
@@ -37,18 +37,11 @@ def f(params):
     batch_size = params['batch_size']
     momentum = params['momentum']
     # batch_size = 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--gpu", type=int, default=0,
-                        help="The ID of GPU to be used; default = 0")
-    args = parser.parse_args() 
     config = tf.ConfigProto() 
-
-    os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
-    print("CUDA visible devices : ", os.environ["CUDA_VISIBLE_DEVICES"])
-
-    config.gpu_options.allow_growth=True
     sess = tf.Session(config=config) 
     K.set_session(sess)
+    # os.environ["CUDA_VISIBLE_DEVICES"]='1,2,3'
+    # config.gpu_options.allow_growth=True
 
     model = ResNet50(include_top=True, weights=None)
 
@@ -85,7 +78,7 @@ def f(params):
 
     model.fit_generator(
             train_generator,
-            steps_per_epoch=10,
+            steps_per_epoch=100,
             epochs=5, validation_data=validation_generator,
             validation_steps=50
             )
@@ -98,22 +91,12 @@ def f(params):
 
     return {'loss': res, 'status': STATUS_OK}
 
-for i, d in enumerate(['/gpu:0', '/gpu:1', '/gpu:2', 'gpu:3']):
+for i, d in enumerate(['/xla_gpu:1', '/xla_gpu:2', 'xla_gpu:3']):
+
     with tf.device(d):
         trials = Trials()
         best = fmin(fn=f, space=fspace1, algo=tpe.suggest, max_evals=20, trials=trials)
 
-        # print('best:', best)
-
-        # print('trials:')
-        # for trial in trials.trials[:2]:
-        #     print(trial)
-
-        # print(len(trials.trials))
-
-
-
-        # f, ax = plt.subplots(1)
         learning_rate_s = [t['misc']['vals']['learning_rate'] for t in trials.trials]
         batch_size_s = [t['misc']['vals']['batch_size'] for t in trials.trials]
         momentums = [t['misc']['vals']['momentum'] for t in trials.trials]
@@ -132,23 +115,24 @@ for i, d in enumerate(['/gpu:0', '/gpu:1', '/gpu:2', 'gpu:3']):
                 f.write(str(i3))
                 f.write('\n')
 
-# best = fmin(fn=f, space=fspace2, algo=tpe.suggest, max_evals=20, trials=trials)
+# with tf.device('/gpu:2'):
+#     best = fmin(fn=f, space=fspace2, algo=tpe.suggest, max_evals=20, trials=trials)
 
-# learning_rate_s = [t['misc']['vals']['learning_rate'] for t in trials.trials]
-# batch_size_s = [t['misc']['vals']['batch_size'] for t in trials.trials]
-# momentums = [t['misc']['vals']['momentum'] for t in trials.trials]
-# losss = [t['result']['loss'] for t in trials.trials]
+#     learning_rate_s = [t['misc']['vals']['learning_rate'] for t in trials.trials]
+#     batch_size_s = [t['misc']['vals']['batch_size'] for t in trials.trials]
+#     momentums = [t['misc']['vals']['momentum'] for t in trials.trials]
+#     losss = [t['result']['loss'] for t in trials.trials]
 
 
 
-# with open('resnet_data.txt', 'a+') as f:
-#     for i1, i2, i3, i4 in zip(learning_rate_s, batch_size_s, losss, momentums):
-#         f.write(str(learning_rate_vector2[i1[0]]))
-#         f.write(', ')
-#         f.write(str(batch_size_vector[i2[0]]))
-#         f.write(', ')
-#         f.write(str(momentum_vector[i4[0]]))
-#         f.write(', ')
-#         f.write(str(i3))
-#         f.write('\n')
+#     with open('resnet_data.txt', 'a+') as f:
+#         for i1, i2, i3, i4 in zip(learning_rate_s, batch_size_s, losss, momentums):
+#             f.write(str(learning_rate_vector2[i1[0]]))
+#             f.write(', ')
+#             f.write(str(batch_size_vector[i2[0]]))
+#             f.write(', ')
+#             f.write(str(momentum_vector[i4[0]]))
+#             f.write(', ')
+#             f.write(str(i3))
+#             f.write('\n')
 
