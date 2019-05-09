@@ -91,7 +91,7 @@ def f(params):
 
     return {'loss': res, 'status': STATUS_OK}
 
-for i, d in enumerate(['/xla_gpu:0','/xla_gpu:1', '/xla_gpu:2', 'xla_gpu:3']):
+for i, d in enumerate(['/xla_gpu:1', '/xla_gpu:2', 'xla_gpu:3','/xla_gpu:0']):
 
     with tf.device(d):
         trials = Trials()
