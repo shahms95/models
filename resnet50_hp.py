@@ -98,7 +98,7 @@ def f(params):
 
     return {'loss': res, 'status': STATUS_OK}
 
-for i, d in enumerate(['/gpu:2', '/gpu:1', 'gpu:3']):
+for i, d in enumerate(['/gpu:0', '/gpu:1', '/gpu:2', 'gpu:3']):
     with tf.device(d):
         trials = Trials()
         best = fmin(fn=f, space=fspace1, algo=tpe.suggest, max_evals=20, trials=trials)
