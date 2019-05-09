@@ -43,7 +43,7 @@ def f(params):
     args = parser.parse_args() 
     config = tf.ConfigProto() 
 
-    os.environ["CUDA_VISIBLE_DEVICES"]=str(args.gpu)
+    os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
     print("CUDA visible devices : ", os.environ["CUDA_VISIBLE_DEVICES"])
 
     config.gpu_options.allow_growth=True
@@ -98,56 +98,57 @@ def f(params):
 
     return {'loss': res, 'status': STATUS_OK}
 
+for i, d in enumerate(['/gpu:2', '/gpu:1', 'gpu:3']):
+    with tf.device(d):
+        trials = Trials()
+        best = fmin(fn=f, space=fspace1, algo=tpe.suggest, max_evals=20, trials=trials)
 
-trials = Trials()
-best = fmin(fn=f, space=fspace1, algo=tpe.suggest, max_evals=20, trials=trials)
+        # print('best:', best)
 
-# print('best:', best)
+        # print('trials:')
+        # for trial in trials.trials[:2]:
+        #     print(trial)
 
-# print('trials:')
-# for trial in trials.trials[:2]:
-#     print(trial)
-
-# print(len(trials.trials))
-
-
-
-# f, ax = plt.subplots(1)
-learning_rate_s = [t['misc']['vals']['learning_rate'] for t in trials.trials]
-batch_size_s = [t['misc']['vals']['batch_size'] for t in trials.trials]
-momentums = [t['misc']['vals']['momentum'] for t in trials.trials]
-losss = [t['result']['loss'] for t in trials.trials]
+        # print(len(trials.trials))
 
 
 
-with open('resnet_data.txt', 'w+') as f:
-    for i1, i2, i3, i4 in zip(learning_rate_s, batch_size_s, losss, momentums):
-        f.write(str(learning_rate_vector1[i1[0]]))
-        f.write(', ')
-        f.write(str(batch_size_vector[i2[0]]))
-        f.write(', ')
-        f.write(str(momentum_vector[i4[0]]))
-        f.write(', ')
-        f.write(str(i3))
-        f.write('\n')
-
-best = fmin(fn=f, space=fspace2, algo=tpe.suggest, max_evals=20, trials=trials)
-
-learning_rate_s = [t['misc']['vals']['learning_rate'] for t in trials.trials]
-batch_size_s = [t['misc']['vals']['batch_size'] for t in trials.trials]
-momentums = [t['misc']['vals']['momentum'] for t in trials.trials]
-losss = [t['result']['loss'] for t in trials.trials]
+        # f, ax = plt.subplots(1)
+        learning_rate_s = [t['misc']['vals']['learning_rate'] for t in trials.trials]
+        batch_size_s = [t['misc']['vals']['batch_size'] for t in trials.trials]
+        momentums = [t['misc']['vals']['momentum'] for t in trials.trials]
+        losss = [t['result']['loss'] for t in trials.trials]
 
 
 
-with open('resnet_data.txt', 'a+') as f:
-    for i1, i2, i3, i4 in zip(learning_rate_s, batch_size_s, losss, momentums):
-        f.write(str(learning_rate_vector2[i1[0]]))
-        f.write(', ')
-        f.write(str(batch_size_vector[i2[0]]))
-        f.write(', ')
-        f.write(str(momentum_vector[i4[0]]))
-        f.write(', ')
-        f.write(str(i3))
-        f.write('\n')
+        with open('resnet_data.txt', 'w+') as f:
+            for i1, i2, i3, i4 in zip(learning_rate_s, batch_size_s, losss, momentums):
+                f.write(str(learning_rate_vector1[i1[0]]))
+                f.write(', ')
+                f.write(str(batch_size_vector[i2[0]]))
+                f.write(', ')
+                f.write(str(momentum_vector[i4[0]]))
+                f.write(', ')
+                f.write(str(i3))
+                f.write('\n')
+
+# best = fmin(fn=f, space=fspace2, algo=tpe.suggest, max_evals=20, trials=trials)
+
+# learning_rate_s = [t['misc']['vals']['learning_rate'] for t in trials.trials]
+# batch_size_s = [t['misc']['vals']['batch_size'] for t in trials.trials]
+# momentums = [t['misc']['vals']['momentum'] for t in trials.trials]
+# losss = [t['result']['loss'] for t in trials.trials]
+
+
+
+# with open('resnet_data.txt', 'a+') as f:
+#     for i1, i2, i3, i4 in zip(learning_rate_s, batch_size_s, losss, momentums):
+#         f.write(str(learning_rate_vector2[i1[0]]))
+#         f.write(', ')
+#         f.write(str(batch_size_vector[i2[0]]))
+#         f.write(', ')
+#         f.write(str(momentum_vector[i4[0]]))
+#         f.write(', ')
+#         f.write(str(i3))
+#         f.write('\n')
 
