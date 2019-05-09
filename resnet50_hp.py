@@ -9,7 +9,7 @@ from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 import matplotlib.pyplot as plt
 import tkinter
 import argparse
-
+import os
 
 from keras.applications.resnet50 import ResNet50
 
